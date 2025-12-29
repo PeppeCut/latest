@@ -1386,4 +1386,20 @@ label {
         min-width: 800px;
         /* Ensure table doesn't squish */
     }
+
+    /* Hide FFT Panel on Mobile */
+    .fft-panel {
+        display: none !important;
+    }
+
+    /* Bot Dashboard Container - Stack Vertically */
+    .bot-dashboard-container {
+        flex-direction: column !important;
+    }
+
+    .bot-dashboard-container>div {
+        flex: 1 !important;
+        width: 100% !important;
+        min-width: 100% !important;
+    }
 }
