@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Interactive cryptocurrency candlestick charts with zoom, pan, and stretch capabilities">
+    <title>Crypto Candlestick Charts - BTC, SUI, Solana & More</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <button id="hamburger-btn" class="hamburger-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <div>
+                    <h1>Crypto Candlestick Charts</h1>
+                    <p class="subtitle">Interactive charts with zoom, pan & stretch</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls-panel">
+            <div style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center; width:100%;">
+
+                <!-- Crypto & Timeframe -->
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <select id="crypto-select" class="crypto-selector" style="padding:0.3rem; min-width:140px;">
+                        <optgroup label="Top Cryptos">
+                            <option value="BTCUSDT">BTC</option>
+                            <option value="ETHUSDT">ETH</option>
+                            <option value="BNBUSDT">BNB</option>
+                            <option value="SOLUSDT">SOL</option>
+                            <option value="XRPUSDT">XRP</option>
+                            <option value="SUIUSDT" selected>SUI</option>
+                        </optgroup>
+                    </select>
+                    <div class="timeframe-buttons">
+                        <button class="tf-btn active" data-timeframe="1m" style="padding:0.3rem 0.5rem;">1m</button>
+                        <button class="tf-btn" data-timeframe="5m" style="padding:0.3rem 0.5rem;">5m</button>
+                        <button class="tf-btn" data-timeframe="15m" style="padding:0.3rem 0.5rem;">15m</button>
+                        <button class="tf-btn" data-timeframe="1h" style="padding:0.3rem 0.5rem;">1h</button>
+                        <button class="tf-btn" data-timeframe="4h" style="padding:0.3rem 0.5rem;">4h</button>
+                        <button class="tf-btn" data-timeframe="1d" style="padding:0.3rem 0.5rem;">1d</button>
+                    </div>
+                </div>
+
+                <div style="width:1px; height:24px; background:rgba(255,255,255,0.1);"></div>
+
+                <!-- Toggles Group 1: Cycles -->
+                <div style="display:flex; gap:1rem; align-items:center;">
+                    <label
+                        style="cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color:#3b82f6;">
+                        <input type="checkbox" id="show-index-cycles" checked> Index (L-H-L)
+                    </label>
+                    <label
+                        style="cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color:#ef4444;">
+                        <input type="checkbox" id="show-inverse-cycles"> Inverse (H-L-H)
+                    </label>
+                </div>
+
+                <div style="width:1px; height:24px; background:rgba(255,255,255,0.1);"></div>
+
+                <!-- Toggles Group 2: Visuals -->
+                <div style="display:flex; gap:0.8rem; align-items:center;">
+                    <label style="font-size: 0.8rem; color:#9ca3af; display:flex; align-items:center; gap:3px;"><input
+                            type="checkbox" id="show-labels" checked> Labels</label>
+                    <label style="font-size: 0.8rem; color:#9ca3af; display:flex; align-items:center; gap:3px;"><input
+                            type="checkbox" id="show-parabola" checked> Parabola</label>
+                    <label style="font-size: 0.8rem; color:#9ca3af; display:flex; align-items:center; gap:3px;"><input
+                            type="checkbox" id="show-projections" checked> Proj</label>
+                    <label style="font-size: 0.8rem; color:#9ca3af; display:flex; align-items:center; gap:3px;"><input
+                            type="checkbox" id="use-momentum-rule" checked> Mom Filter</label>
+                    <label style="font-size: 0.8rem; color:#9ca3af; display:flex; align-items:center; gap:3px;"><input
+                            type="checkbox" id="priority-24-bars" checked> Force 24 Bars</label>
+                </div>
+
+                <div style="width:1px; height:24px; background:rgba(255,255,255,0.1);"></div>
+
+                <!-- Custom Cycle Range -->
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <span style="font-size: 0.75rem; color:#9ca3af;">Range:</span>
+                    <input type="number" id="custom-min" value="12" min="5" max="200"
+                        style="width: 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(99,102,241,0.3); color: white; padding: 0.2rem 0.3rem; border-radius: 4px; font-size: 0.8rem; text-align: center;">
+                    <span style="font-size: 0.75rem; color:#9ca3af;">-</span>
+                    <input type="number" id="custom-max" value="60" min="5" max="200"
+                        style="width: 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(99,102,241,0.3); color: white; padding: 0.2rem 0.3rem; border-radius: 4px; font-size: 0.8rem; text-align: center;">
+                    <span style="font-size: 0.75rem; color:#9ca3af;">bars</span>
+                </div>
+
+                <div style="width:1px; height:24px; background:rgba(255,255,255,0.1);"></div>
+
+                <!-- Vertical Scale -->
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <span style="font-size: 0.75rem; color:#9ca3af;">V-Scale:</span>
+                    <input type="range" id="v-scale" min="50" max="300" value="100"
+                        style="width: 80px; accent-color: #6366f1;">
+                    <span id="v-scale-value" style="font-size: 0.75rem; color:#9ca3af; min-width: 30px;">100%</span>
+                </div>
+
+                <div style="flex:1;"></div>
+
+                <!-- Actions -->
+                <div style="display:flex; gap:0.5rem;">
+                    <div style="display:flex; align-items:center; gap:0.3rem;">
+                        <input type="checkbox" id="voice-enabled" style="accent-color: #f59e0b;">
+                        <span style="font-size: 0.75rem; color:#9ca3af;">Voice</span>
+                    </div>
+                    <button id="optimize-btn" class="action-btn"
+                        style="padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #10b981, #059669); border: none;">🔍
+                        Optimize</button>
+                    <button id="reset-btn" class="action-btn" style="padding: 0.3rem 0.6rem;">Reset</button>
+                    <button id="refresh-btn" class="action-btn" style="padding: 0.3rem 0.6rem;">Refresh</button>
+                </div>
+            </div>
+
+            <!-- Hidden inputs needed for JS logic preservation -->
+            <div style="display:none;">
+                <input type="number" id="mom-cycs" value="50">
+                <input type="number" id="mom-lbl" value="5">
+                <input type="number" id="mom-lbr" value="5">
+                <input type="number" id="mom-min" value="5">
+                <input type="number" id="mom-max" value="60">
+                <input type="checkbox" id="show-min" checked>
+                <!-- priority-24-bars moved to visible controls -->
+                <button id="manual-mode-btn">Set Manual</button>
+                <button id="clear-manual-btn">Clear</button>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Index Cycles Stats Panel -->
+    <div id="index-stats-panel" class="cycle-stats-panel index-panel">
+        <h3><span style="color: #3b82f6;">●</span> Index Cycles (Low-High-Low)</h3>
+        <div class="stats-content">
+            <div class="stats-metrics">
+                <div class="metric"><span class="label">Cycles</span><span id="idx-count" class="value">0</span></div>
+                <div class="metric"><span class="label">Avg Duration</span><span id="idx-avg-dur" class="value">-</span>
+                </div>
+                <div class="metric highlight"><span class="label">Avg Pump %</span><span id="idx-avg-pump"
+                        class="value positive">-</span></div>
+                <div class="metric"><span class="label">Max Δ Price</span><span id="idx-max-price"
+                        class="value">-</span></div>
+                <div class="metric"><span class="label">Std Dev</span><span id="idx-std" class="value">-</span></div>
+                <div class="metric"><span class="label">First→End</span><span id="idx-first-end" class="value">-</span>
+                </div>
+                <div class="metric"><span class="label">Vol Δ Pre</span><span id="idx-vol-pre" class="value">-</span>
+                </div>
+                <div class="metric"><span class="label">Vol Δ Post</span><span id="idx-vol-post" class="value">-</span>
+                </div>
+            </div>
+            <div class="stats-charts">
+                <div class="chart-box">
+                    <span class="chart-label">Duration Trend</span>
+                    <canvas id="idx-trend-chart" width="200" height="80"></canvas>
+                </div>
+                <div class="chart-box">
+                    <span class="chart-label">Distribution</span>
+                    <canvas id="idx-dist-chart" width="200" height="80"></canvas>
+                </div>
+                <div class="chart-box">
+                    <span class="chart-label">Volume Δ</span>
+                    <canvas id="idx-vol-chart" width="200" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inverse Cycles Stats Panel -->
+    <div id="inverse-stats-panel" class="cycle-stats-panel inverse-panel">
+        <h3><span style="color: #ef4444;">●</span> Inverse Cycles (High-Low-High)</h3>
+        <div class="stats-content">
+            <div class="stats-metrics">
+                <div class="metric"><span class="label">Cycles</span><span id="inv-count" class="value">0</span></div>
+                <div class="metric"><span class="label">Avg Duration</span><span id="inv-avg-dur" class="value">-</span>
+                </div>
+                <div class="metric highlight"><span class="label">Avg Drop %</span><span id="inv-avg-drop"
+                        class="value negative">-</span></div>
+                <div class="metric"><span class="label">Max Δ Price</span><span id="inv-max-price"
+                        class="value">-</span></div>
+                <div class="metric"><span class="label">Std Dev</span><span id="inv-std" class="value">-</span></div>
+                <div class="metric"><span class="label">First→End</span><span id="inv-first-end" class="value">-</span>
+                </div>
+                <div class="metric"><span class="label">Vol Δ Pre</span><span id="inv-vol-pre" class="value">-</span>
+                </div>
+                <div class="metric"><span class="label">Vol Δ Post</span><span id="inv-vol-post" class="value">-</span>
+                </div>
+            </div>
+            <div class="stats-charts">
+                <div class="chart-box">
+                    <span class="chart-label">Duration Trend</span>
+                    <canvas id="inv-trend-chart" width="200" height="80"></canvas>
+                </div>
+                <div class="chart-box">
+                    <span class="chart-label">Distribution</span>
+                    <canvas id="inv-dist-chart" width="200" height="80"></canvas>
+                </div>
+                <div class="chart-box">
+                    <span class="chart-label">Volume Δ</span>
+                    <canvas id="inv-vol-chart" width="200" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bot-dashboard-container" style="display:flex; gap: 1rem; margin-bottom: 1rem;">
+        <!-- Left Side: Bot Panel -->
+        <div style="flex: 3; min-width: 0;">
+            <div class="bot-panel-compact" style="height: 100%;">
+                <div class="bot-row">
+                    <span class="bot-title">🤖 Bot</span>
+                    <label class="bot-toggle"><input type="checkbox" id="bot-enabled" checked><span
+                            class="toggle-slider"></span></label>
+                    <span id="bot-status" class="bot-status">OFF</span>
+
+                    <div class="bot-input"><label>Bal</label><input type="number" id="bot-balance" value="1000"
+                            min="100" step="100"></div>
+                    <div class="bot-input"><label>Lev</label><input type="number" id="bot-leverage" value="20" min="1"
+                            max="125" step="1"></div>
+                    <div class="bot-input"><label>Cap%</label><input type="number" id="bot-capital" value="30" min="1"
+                            max="100" step="1"></div>
+                    <div class="bot-input"><label>TP1%</label><input type="number" id="bot-tp1-pct" value="30" min="10"
+                            max="100" step="5"></div>
+                    <div class="bot-input"><label>TP1 Cl%</label><input type="number" id="bot-tp1-close" value="60"
+                            min="10" max="90" step="10"></div>
+                    <div class="bot-input"><label>TP2%</label><input type="number" id="bot-tp2-pct" value="150" min="50"
+                            max="300" step="10"></div>
+                    <div class="bot-input fees"><label>Fees 0.04%</label><label class="bot-toggle small"><input
+                                type="checkbox" id="bot-fees"><span class="toggle-slider"></span></label></div>
+                    <div class="bot-input fees"><label>Confirmation</label><label class="bot-toggle small"><input
+                                type="checkbox" id="bot-3bar" checked><span class="toggle-slider"></span></label></div>
+                    <div class="bot-input fees"><label>Opp. Close</label><label class="bot-toggle small"><input
+                                type="checkbox" id="bot-opp-close"><span class="toggle-slider"></span></label></div>
+                    <div class="bot-input fees"><label>MA Trend</label><label class="bot-toggle small"><input
+                                type="checkbox" id="bot-ma-trend"><span class="toggle-slider"></span></label></div>
+                    <div class="bot-input"><label>Max Loss%</label><input type="number" id="bot-max-loss-pct" value="5"
+                            min="1" max="100" step="1"></div>
+                    <div class="bot-input fees"><label>Max Loss</label><label class="bot-toggle small"><input
+                                type="checkbox" id="bot-max-loss"><span class="toggle-slider"></span></label></div>
+                </div>
+                <div class="bot-row stats">
+                    <div class="stat"><span>PnL</span><span id="bot-pnl" class="val">$0</span></div>
+                    <div class="stat"><span>PnL%</span><span id="bot-pnl-percent" class="val">0%</span></div>
+                    <div class="stat"><span>WR</span><span id="bot-winrate" class="val">0%</span></div>
+                    <div class="stat"><span>Trades</span><span id="bot-trades" class="val">0</span></div>
+                    <div class="stat"><span>Balance</span><span id="bot-current-balance" class="val">$1000</span></div>
+                </div>
+                <div class="bot-row open-trade-row">
+                    <div class="open-trade-info">
+                        <span class="open-label">Open:</span>
+                        <span id="open-trade-type" class="open-type">-</span>
+                        <span class="open-label">Entry:</span>
+                        <span id="open-trade-entry" class="open-val">-</span>
+                        <span class="open-label">Unr.PnL:</span>
+                        <span id="open-trade-pnl" class="open-val">-</span>
+                    </div>
+                    <div class="open-trade-levels">
+                        <span class="level-label">TP1:</span>
+                        <span id="open-trade-tp1" class="level-val tp">-</span>
+                        <span class="level-label">TP2:</span>
+                        <span id="open-trade-tp2" class="level-val tp">-</span>
+                        <span class="level-label">SL:</span>
+                        <span id="open-trade-sl" class="level-val sl">-</span>
+                    </div>
+                </div>
+                <div class="bot-row table-row">
+                    <table class="trade-stats-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Long</th>
+                                <th>Short</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Qty</td>
+                                <td id="stat-long-qty">0</td>
+                                <td id="stat-short-qty">0</td>
+                                <td id="stat-total-qty">0</td>
+                            </tr>
+                            <tr>
+                                <td>Failed (SL)</td>
+                                <td id="stat-long-failed">0</td>
+                                <td id="stat-short-failed">0</td>
+                                <td id="stat-total-failed">0</td>
+                            </tr>
+                            <tr>
+                                <td>TP1</td>
+                                <td id="stat-long-tp1">0</td>
+                                <td id="stat-short-tp1">0</td>
+                                <td id="stat-total-tp1">0</td>
+                            </tr>
+                            <tr>
+                                <td>TP2</td>
+                                <td id="stat-long-tp2">0</td>
+                                <td id="stat-short-tp2">0</td>
+                                <td id="stat-total-tp2">0</td>
+                            </tr>
+                            <tr>
+                                <td>Cycle End</td>
+                                <td id="stat-long-cycle">0</td>
+                                <td id="stat-short-cycle">0</td>
+                                <td id="stat-total-cycle">0</td>
+                            </tr>
+                            <tr class="gain">
+                                <td>Gain TP1</td>
+                                <td id="stat-long-gain-tp1">$0</td>
+                                <td id="stat-short-gain-tp1">$0</td>
+                                <td id="stat-total-gain-tp1">$0</td>
+                            </tr>
+                            <tr class="gain">
+                                <td>Gain TP2</td>
+                                <td id="stat-long-gain-tp2">$0</td>
+                                <td id="stat-short-gain-tp2">$0</td>
+                                <td id="stat-total-gain-tp2">$0</td>
+                            </tr>
+                            <tr class="loss">
+                                <td>Loss</td>
+                                <td id="stat-long-loss">$0</td>
+                                <td id="stat-short-loss">$0</td>
+                                <td id="stat-total-loss">$0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <canvas id="bot-equity-chart" width="450" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: FFT Analysis -->
+        <div class="fft-panel"
+            style="flex: 1; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; min-width: 300px;">
+            <h3>FFT Analysis</h3>
+            <canvas id="fft-chart" width="400" height="250" style="width: 100%; height: 100%;"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading chart data...</p>
+        </div>
+        <canvas id="chart-canvas"></canvas>
+        <div id="candle-countdown" class="candle-countdown">--:--</div>
+        <div id="price-info" class="price-info">
+            <div class="info-row">
+                <span class="info-label">Open:</span>
+                <span id="info-open" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">High:</span>
+                <span id="info-high" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Low:</span>
+                <span id="info-low" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Close:</span>
+                <span id="info-close" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Time:</span>
+                <span id="info-time" class="info-value">-</span>
+            </div>
+        </div>
+    </div>
+    <!-- Historical Trades Table -->
+    <div class="trades-history-panel">
+        <div class="trades-history-header">
+            <h3>📋 Trade History</h3>
+            <div class="trades-filters">
+                <select id="filter-type" class="trade-filter-select">
+                    <option value="all">All Types</option>
+                    <option value="LONG">LONG</option>
+                    <option value="SHORT">SHORT</option>
+                </select>
+                <select id="filter-exit" class="trade-filter-select">
+                    <option value="all">All Exits</option>
+                    <option value="tp1">TP1</option>
+                    <option value="tp2">TP2</option>
+                    <option value="sl">SL</option>
+                    <option value="be">BE</option>
+                    <option value="cycle">Cycle</option>
+                </select>
+                <select id="filter-result" class="trade-filter-select">
+                    <option value="all">All Results</option>
+                    <option value="win">Wins</option>
+                    <option value="loss">Losses</option>
+                </select>
+            </div>
+            <span id="trades-timeframe" class="trades-timeframe">1m</span>
+        </div>
+        <div class="trades-table-wrapper">
+            <table class="trades-history-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="id"># ↕</th>
+                        <th class="sortable" data-sort="time">Time ↕</th>
+                        <th>Type</th>
+                        <th>Entry</th>
+                        <th class="sortable" data-sort="cycle">Cycle % ↕</th>
+                        <th class="sortable" data-sort="lagopen">Lag Open ↕</th>
+                        <th class="sortable" data-sort="lag">Lag ↕</th>
+                        <th>Exit</th>
+                        <th class="sortable" data-sort="fees">Fees ↕</th>
+                        <th class="sortable" data-sort="pnl">P&L ↕</th>
+                    </tr>
+                </thead>
+                <tbody id="trades-history-body">
+                    <tr>
+                        <td colspan="10" class="no-trades">No trades yet</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="cycle_detector.js"></script>
+    <script src="chart.js"></script>
+    <script src="cycle_momentum.js"></script>
+    <script src="cycle_bot.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
+```
